@@ -1,8 +1,9 @@
 
 {{block.description|default('missing description')}}
+{% if block.properties is defined %}
 |Key|Type|Properties|
 |---|---|---|
-{% for key, value in block.properties.items() %}
+{% for key, value in block.properties.items()|default({}) %}
 {% set bean = namespace() %}
 {% set bean.data = '' %}
 {%- for subkey, subvalue in value.items() if subkey not in ['type', 'properties'] -%} 
@@ -14,7 +15,8 @@
 {% endfor %}
 |{{key}}|{{value.type}}|{{bean.data}}|
 {% endfor %}
-{% for key, value in block.properties.items() if value.type == 'object' %}
+{% for key, value in block.properties.items()|default({}) if value.type == 'object' %}
 {% set block = value %}
 {% include 'Block.j2' %}
 {% endfor %}
+{% endif %}
