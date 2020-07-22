@@ -1,19 +1,19 @@
 # {{title}}
 
 {{description}}
-|Key|Title|Description|Type|Default|Properties|
-|---|---|---|---|---|---|
+|Key|Title|Description|Type|Default|Allowed Values|Fixed Value|Properties|
+|---|---|---|---|---|---|---|---|
 {% for key, value in properties.items() %}
 {% set bean = namespace() %}
 {% set bean.data = '' %}
-{%- for subkey, subvalue in value.items() if subkey not in ['type', 'title', 'default', 'description', 'properties', 'additionalProperties'] -%} 
+{%- for subkey, subvalue in value.items() if subkey not in ['type', 'title', 'default', 'description', 'enum', 'const', 'properties', 'additionalProperties'] -%} 
 {%- if loop.first -%}
 {% set bean.data = subkey ~ ' = ' ~ subvalue %}
 {% else %}
 {% set bean.data = bean.data ~ '<br>' ~ subkey ~ ' = ' ~ subvalue %}
 {% endif %}
 {% endfor %}
-|{{key}}|{{value.title}}|{{value.description}}|{{value.type}}|{{value.default|default()}}|{{bean.data}}|
+|{{key}}|{{value.title}}|{{value.description}}|{{value.type}}|{{value.default|default()}}|{{value.enum|default()}}|{{value.const|default()}}|{{bean.data}}|
 {% endfor %}
 {% for key, value in properties.items() if value.type == 'object' %}
 {% set block = value %}
