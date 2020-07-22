@@ -1,6 +1,8 @@
 
-{{turnip}} {{block.title|default('Missing')}}
+{{turnip}} {{key|default('Missing')}}
 {% set turnip = turnip ~ '#' %}
+
+{{block.title|default('Missing Title')}}
 
 {{block.description|default('missing description')}}
 
@@ -18,8 +20,23 @@
 {% set bean.data = bean.data ~ '<br>' ~ subkey ~ ' = ' ~ subvalue %}
 {% endif %}
 {% endfor %}
-{% if value.type == 'array' %}
+{% if value.type == 'object' %}
+{% set type = '[object](#' ~ key|default() ~ ')' %}
+{% elif value.type == 'array' %}
+{% if value['items'].anyOf is defined %}
+{% set potato = namespace() %}
+{% set potato.data = '' %}
+{% for subvalue in value['items'].anyOf %}
+{% if loop.first %}
+{% set potato.data = subvalue.type %}
+{% else %}
+{% set potato.data = potato.data ~ ',' ~ subvalue.type %}
+{% endif %}
+{% endfor %}
+{% set type = value.type ~ '[' ~ potato.data ~ ']' %}
+{% else %}
 {% set type = value.type ~ '[' ~ value['items'].type|default() ~ ']' %}
+{% endif %}
 {% else %}
 {% set type = value.type %}
 {% endif %}
@@ -44,3 +61,6 @@
 {% include 'Block.j2' %}
 {% endfor %}
 {% endif %}
+
+
+
