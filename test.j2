@@ -1,0 +1,20 @@
+
+{{description}}
+|Key|Type|Properties|
+|---|---|---|
+{% for key, value in properties.items() %}
+{% set bean = namespace() %}
+{% set bean.data = '' %}
+{%- for subkey, subvalue in value.items() if subkey not in ['type', 'properties'] -%} 
+{%- if loop.first -%}
+{% set bean.data = subkey ~ ' = ' ~ subvalue %}
+{% else %}
+{% set bean.data = bean.data ~ '<br>' ~ subkey ~ ' = ' ~ subvalue %}
+{% endif %}
+{% endfor %}
+|{{key}}|{{value.type}}|{{bean.data}}|
+{% endfor %}
+{% for key, value in properties.items() if value.type == 'object' %}
+{% set block = value %}
+{% include 'Block.j2' %}
+{% endfor %}

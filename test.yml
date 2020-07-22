@@ -1,0 +1,8 @@
+- hosts: localhost
+  tasks:
+    
+
+    - name: template
+      template: 
+        src: test.j2
+        dest: ~/test.md
