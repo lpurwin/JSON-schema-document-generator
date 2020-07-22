@@ -13,7 +13,12 @@
 {% set bean.data = bean.data ~ '<br>' ~ subkey ~ ' = ' ~ subvalue %}
 {% endif %}
 {% endfor %}
-|{{key}}|{{value.title}}|{{value.description}}|{{value.type}}|{{value.default|default()}}|{{value.enum|default()}}|{{value.const|default()}}|{{bean.data}}|
+{% if value.type == 'object' %}
+{% set type = '[object](#' ~ key|default() ~ ')' %}
+{% else %}
+{% set type = value.type %}
+{% endif %}
+|{{key}}|{{value.title}}|{{value.description}}|{{type}}|{{value.default|default()}}|{{value.enum|default()}}|{{value.const|default()}}|{{bean.data}}|
 {% endfor %}
 {% for key, value in properties.items() if value.type == 'object' %}
 {% set block = value %}
