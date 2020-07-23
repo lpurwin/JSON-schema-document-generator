@@ -1,12 +1,12 @@
 # {{title}}
 
 {{description}}
-|Key|Title|Description|Type|Default|Allowed Values|Fixed Value|Properties|
-|---|---|---|---|---|---|---|---|
+|Key|Title|Description|Type|Default|Allowed Values|Fixed Value|Properties|Required|
+|---|---|---|---|---|---|---|---|---|
 {% for key, value in properties.items() %}
 {% set bean = namespace() %}
 {% set bean.data = '' %}
-{%- for subkey, subvalue in value.items() if subkey not in ['type', 'title', 'default', 'description', 'enum', 'const', 'properties', 'additionalProperties'] -%} 
+{%- for subkey, subvalue in value.items() if subkey not in ['type', 'title', 'default', 'description', 'enum', 'const', 'properties', 'additionalProperties', 'required'] -%} 
 {%- if loop.first -%}
 {% set bean.data = subkey ~ ' = ' ~ subvalue %}
 {% else %}
@@ -18,10 +18,16 @@
 {% else %}
 {% set type = value.type %}
 {% endif %}
-|{{key}}|{{value.title}}|{{value.description}}|{{type}}|{{value.default|default()}}|{{value.enum|default()}}|{{value.const|default()}}|{{bean.data}}|
+{% if key in required|default() %}
+{% set parsnip = 'true' %}
+{%else%}
+{% set parsnip = 'false' %}
+{%endif%}
+|{{key}}|{{value.title}}|{{value.description}}|{{type}}|{{value.default|default()}}|{{value.enum|default()}}|{{value.const|default()}}|{{bean.data}}|{{parsnip|default()}}|
 {% endfor %}
 {% for key, value in properties.items() if value.type == 'object' %}
 {% set block = value %}
 {% set turnip = '##' %}
 {% include 'Block.j2' %}
 {% endfor %}
+
