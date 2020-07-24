@@ -1,33 +1,40 @@
+{# 
+Produces three inital elements; the title, description and the table for root level objects within the JSON schema.
+#}
 # {{title}}
 
 {{description}}
 |Key|Title|Description|Type|Default|Allowed Values|Fixed Value|Properties|Required|
 |---|---|---|---|---|---|---|---|---|
+{# looping through properties of the root level object to produce the table #}
 {% for key, value in properties.items() %}
-{% set bean = namespace() %}
-{% set bean.data = '' %}
-{%- for subkey, subvalue in value.items() if subkey not in ['type', 'title', 'default', 'description', 'enum', 'const', 'properties', 'additionalProperties', 'required'] -%} 
-{%- if loop.first -%}
-{% set bean.data = subkey ~ ' = ' ~ subvalue %}
-{% else %}
-{% set bean.data = bean.data ~ '<br>' ~ subkey ~ ' = ' ~ subvalue %}
-{% endif %}
+    {%- set bean = namespace() -%}
+    {%- set bean.data = '' -%}
+    {%- for subkey, subvalue in value.items() if subkey not in ['type', 'title', 'default', 'description', 'enum', 'const', 'properties', 'additionalProperties', 'required'] -%} 
+        {%- if loop.first -%}
+            {%- set bean.data = subkey ~ ' = ' ~ subvalue -%}
+        {%- else -%}
+            {%- set bean.data = bean.data ~ '<br>' ~ subkey ~ ' = ' ~ subvalue -%}
+        {%- endif -%}
+    {%- endfor -%}
+{# for the type column, if the value is an 'object' then this is printed with a link to this object unique table #}
+    {%- if value.type == 'object' -%}
+        {%- set type = '[object](#' ~ key|default() ~ ')' -%}
+    {%- else -%}
+        {%- set type = value.type -%}
+    {%- endif -%}
+{# if the key name is found within the required values, this produces a true value within the required column, otherwise this value is presented as false #}
+    {%- if key in required|default() -%}
+        {%- set required = 'true' -%}
+    {%- else -%}
+        {%- set required = 'false' -%}
+    {%- endif -%}
+|{{key}}|{{value.title}}|{{value.description}}|{{type}}|{{value.default|default()}}|{{value.enum|default()}}|{{value.const|default()}}|{{bean.data}}|{{required|default()}}|
 {% endfor %}
-{% if value.type == 'object' %}
-{% set type = '[object](#' ~ key|default() ~ ')' %}
-{% else %}
-{% set type = value.type %}
-{% endif %}
-{% if key in required|default() %}
-{% set parsnip = 'true' %}
-{%else%}
-{% set parsnip = 'false' %}
-{%endif%}
-|{{key}}|{{value.title}}|{{value.description}}|{{type}}|{{value.default|default()}}|{{value.enum|default()}}|{{value.const|default()}}|{{bean.data}}|{{parsnip|default()}}|
-{% endfor %}
-{% for key, value in properties.items() if value.type == 'object' %}
-{% set block = value %}
-{% set turnip = '##' %}
-{% include 'Block.j2' %}
-{% endfor %}
+{# second loop that produces table for component objects #}
+{%- for key, value in properties.items() if value.type == 'object' -%}
+    {%- set block = value -%}
+    {%- set parent = title -%}
+    {%- include 'Block.j2' -%}
+{%- endfor -%}
 
